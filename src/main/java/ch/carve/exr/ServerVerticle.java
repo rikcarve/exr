@@ -7,6 +7,7 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.LoggerFormat;
 import io.vertx.ext.web.handler.impl.LoggerHandlerImpl;
 
@@ -16,9 +17,12 @@ public class ServerVerticle extends AbstractVerticle {
     public void start(Future<Void> fut) {
 
         Router router = Router.router(vertx);
-        router.route().handler(new LoggerHandlerImpl(LoggerFormat.SHORT));
+        router.route()
+            .handler(new LoggerHandlerImpl(LoggerFormat.SHORT))
+            .handler(BodyHandler.create());
         router.get("/").handler(this::hello);
-        router.get("/exr").handler(this::handle);
+        router.get("/exr").handler(this::handleGetSingle);
+        router.put("/exr").handler(this::handlePut);
 
         // new HttpServerOptions().setLogActivity(true)
         vertx.createHttpServer().requestHandler(router::accept).listen(8080, result -> {
@@ -30,12 +34,17 @@ public class ServerVerticle extends AbstractVerticle {
         });
     }
 
-    public void handle(RoutingContext event) {
+    public void handleGetSingle(RoutingContext event) {
         String msg = new JsonObject()
                 .put("base", event.request().getParam("base"))
                 .put("to", event.request().getParam("to"))
                 .encode();
         vertx.eventBus().send(ExrEvents.SINGLE_RATE.name(), msg, res -> handleResponse(res, event));
+    }
+
+    public void handlePut(RoutingContext event) {
+        String msg = event.getBodyAsString();
+        vertx.eventBus().send(ExrEvents.CREATE.name(), msg, res -> handleResponse(res, event));
     }
 
     private void handleResponse(AsyncResult<Message<Object>> res, RoutingContext context) {
