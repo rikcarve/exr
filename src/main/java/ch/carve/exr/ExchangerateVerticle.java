@@ -42,7 +42,7 @@ public class ExchangerateVerticle extends AbstractVerticle {
         consumer.handler(this::handler);
         MessageConsumer<String> consumer2 = vertx.eventBus().consumer(ExrEvents.CREATE.name());
         consumer2.handler(this::handleCreate);
-        Cluster cluster = Cluster.builder().addContactPoint("localhost").build();
+        Cluster cluster = Cluster.builder().addContactPoint("192.168.91.80").build();
         session = cluster.connect();
         session.execute(CREATE_KEYSPACE);
         session.execute(CREATE_TABLE);

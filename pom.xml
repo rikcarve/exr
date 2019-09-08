@@ -11,7 +11,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <vertx.version>3.5.2</vertx.version>
-        <cassandra.version>3.6.0</cassandra.version>
+        <cassandra.version>3.7.2</cassandra.version>
         <dmp.version>0.25.1</dmp.version>
         <docker.name>rikcarve/vertx</docker.name>
     </properties>
