@@ -1,0 +1,145 @@
+openapi: 3.0.1
+info:
+  title: exchangerate
+  version: '2.0'
+servers:
+  - url: /exchangerate/
+    variables: {}
+paths:
+  /v0/ecb-rates:
+    get:
+      summary: Get all ECB rates as of today
+      operationId: getCurrentRates
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EcbRate'
+  /v0/exchange-rates/last:
+    get:
+      summary: Get all rates from last processed file
+      operationId: getLastFileExchangeRates
+      responses:
+        default:
+          description: Rates from last processed file
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExchangeRate'
+  /v0/exchange-rates:
+    get:
+      summary: 'Get a rate. Usage:  1 <fixedCurrency> = x <variableCurrency>'
+      operationId: getExchangeRates
+      parameters:
+        - name: fixedCurrency
+          in: query
+          description: Fixed currency (aka 1 XYZ)
+          schema:
+            type: integer
+            format: int32
+          example: 840
+        - name: variableCurrency
+          in: query
+          description: Variable currency (? ABC)
+          schema:
+            type: integer
+            format: int32
+          example: 756
+      responses:
+        '200':
+          description: >-
+            Success. Returns rate object including ask, bid and mid rate, valor
+            and stockexchange
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeRate'
+        '404':
+          description: No rate found
+components:
+  schemas:
+    EcbRateDelivery:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        dueDate:
+          type: string
+          format: date
+        deliveryDateTime:
+          type: string
+          format: date-time
+    Currency:
+      type: object
+      properties:
+        isoCode:
+          type: integer
+          format: int32
+        isoAlphaCode:
+          type: string
+    EcbRate:
+      type: object
+      properties:
+        effectiveDate:
+          type: string
+          format: date-time
+        valueDate:
+          type: string
+          format: date
+        fixedCurrency:
+          $ref: '#/components/schemas/Currency'
+        variableCurrency:
+          $ref: '#/components/schemas/Currency'
+        rate:
+          type: number
+    ExchangeRateFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        deliveryDateTime:
+          type: integer
+          format: int64
+        digest:
+          type: string
+        sequenceNr:
+          type: integer
+          format: int32
+        jobId:
+          type: integer
+          format: int64
+    ExchangeRate:
+      type: object
+      properties:
+        valueDate:
+          type: string
+          format: date-time
+        effectiveDate:
+          type: string
+          format: date-time
+        fixedCurrency:
+          $ref: '#/components/schemas/Currency'
+        variableCurrency:
+          $ref: '#/components/schemas/Currency'
+        bidRate:
+          type: number
+        askRate:
+          type: number
+        valor:
+          type: integer
+          format: int64
+        stockExchange:
+          type: integer
+          format: int32
+        sequenceNr:
+          type: integer
+          format: int32
+        rate:
+          type: number 
